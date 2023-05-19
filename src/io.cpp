@@ -70,3 +70,29 @@ Graph io::read_network(const std::string &in_node_path, const std::string &in_li
 {
     return Graph{read_node(in_node_path), read_link(in_link_path)};
 }
+
+std::vector<OD> io::read_od(const std::string &od_path)
+{
+    std::ifstream ifs(od_path);
+    if (!ifs)
+    {
+        throw "Exception : od network file not found";
+    }
+    std::string row_str;
+    getline(ifs, row_str); // 1行とばす
+
+    std::vector<OD> res;
+    while (getline(ifs, row_str))
+    {
+        const auto row_vec = split(row_str);
+        assert(row_vec.size() == 5);
+        double olat = std::stod(row_vec.at(0));
+        double olon = std::stoi(row_vec.at(1));
+        double dlat = std::stod(row_vec.at(2));
+        double dlon = std::stod(row_vec.at(3));
+        double flow = std::stod(row_vec.at(4));
+        OD od = {olat, olon, dlat, dlon, flow};
+        res.emplace_back(od);
+    }
+    return res;
+}
