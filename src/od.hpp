@@ -1,5 +1,4 @@
-struct OD
-{
+struct OD {
     double olat;
     double olon;
     double dlat;
