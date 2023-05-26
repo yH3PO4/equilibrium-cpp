@@ -14,7 +14,7 @@ int main() {
     std::vector<OD> ods = io::read_od(od_path);
 
     for (auto& od : ods) {
-        od.road_nearest_node = assignment::calc_nearest_node(od, road_graph);
+        od.road_nearest_node = assignment::findNearestNode(od, road_graph);
     }
-    assignment::assignment(road_graph, ods);
+    // assignment::assignment(road_graph, ods);
 }

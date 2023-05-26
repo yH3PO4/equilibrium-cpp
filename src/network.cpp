@@ -31,6 +31,7 @@ Graph::Graph(std::vector<Node> nodes, std::vector<Link> links) {
 }
 
 std::vector<Link> Graph::shortest_path(const int &oNodeID, const int &dNodeID) {
+    return std::vector<Link>{};
 }
 
 void Graph::initialize_flow() {

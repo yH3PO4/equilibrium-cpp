@@ -17,6 +17,10 @@ struct Link {
 
 class Graph {
    public:
+    std::unordered_map<int, Node> nodes;
+    // directed graph
+    std::unordered_map<int, std::vector<Link>> adj_list;
+
     Graph(std::vector<Node> nodes, std::vector<Link> links);
     std::vector<Link> shortest_path(const int &oNodeID, const int &dNodeID);
     void initialize_flow();
@@ -26,9 +30,6 @@ class Graph {
     const double beta = 2.52;   // BPR関数のパラメータ
     const double gamma = 16.0;  // 日換算係数
     const double c = 350.0;     // 1車線あたりの交通容量
-    std::unordered_map<int, Node> nodes;
-    // directed graph
-    std::unordered_map<int, std::vector<Link>> adj_list;
     double bpr(const double &flow, const double &freecost,
                const double &capacity);
 };
