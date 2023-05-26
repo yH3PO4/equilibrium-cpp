@@ -14,7 +14,6 @@ Link::Link(int _id, int _oNodeID, int _dNodeID, int _laneCount, int _maxSpeed) {
     this->dNodeID = _dNodeID;
     this->laneCount = _laneCount;
     this->maxSpeed = _maxSpeed;
-    this->type = LinkType::Road;  // TODO; Railwayも追加
     this->flow = 0;
     this->newflow = 0;
     this->cost = 0;
@@ -31,18 +30,22 @@ Graph::Graph(std::vector<Node> nodes, std::vector<Link> links) {
     }
 }
 
-void Graph::assignment(double &alpha, double &beta) {
+std::vector<Link> Graph::shortest_path(const int &oNodeID, const int &dNodeID) {
+}
+
+void Graph::initialize_flow() {
     for (auto &[s, links] : this->adj_list) {
         for (auto &link : links) {
             link.flow = 0.0;
             link.newflow = 0.0;  // 全リンクの交通量・更新交通量を0にする
-            link.cost = bpr(link.flow, link.freecost, link.capacity, alpha,
-                            beta);  // BPR関数でコストを計算
+            link.cost = this->bpr(link.flow, link.freecost,
+                                  link.capacity);  // BPR関数でコストを計算
         }
     }
 }
 
-double bpr(const double &flow, const double &freecost, const double &capacity,
-           const double &alpha, const double &beta) {
-    return freecost * (1.0 + alpha * std::pow((flow / capacity), beta));
+double Graph::bpr(const double &flow, const double &freecost,
+                  const double &capacity) {
+    return freecost *
+           (1.0 + this->alpha * std::pow((flow / capacity), this->beta));
 }
