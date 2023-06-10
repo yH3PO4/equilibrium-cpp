@@ -1,35 +1,24 @@
 #pragma once
 
-#include <unordered_map>
-#include <vector>
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/graph/adjacency_list.hpp>
+
+namespace bg = boost::geometry;
+typedef bg::model::point<double, 2, bg::cs::geographic<bg::degree>> point;
 
 struct Node {
     int id;
-    double lon, lat;
+    point lonlat;
     Node(int _nodeID, double _lat, double _lon);
 };
 
 struct Link {
-    int id, oNodeID, dNodeID, laneCount, maxSpeed;
+    int id, laneCount, maxSpeed;
     double flow, newflow, cost, freecost, capacity;
-    Link(int _id, int _oNodeID, int _dNodeID, int _laneCount, int _maxSpeed);
+    Link(int _id, int _laneCount, int _maxSpeed);
 };
 
-class Graph {
-   public:
-    std::unordered_map<int, Node> nodes;
-    // directed graph
-    std::unordered_map<int, std::vector<Link>> adj_list;
-
-    Graph(std::vector<Node> nodes, std::vector<Link> links);
-    std::vector<Link> shortest_path(const int &oNodeID, const int &dNodeID);
-    void initialize_flow();
-
-   private:
-    const double alpha = 0.48;  // BPR関数のパラメータ
-    const double beta = 2.52;   // BPR関数のパラメータ
-    const double gamma = 16.0;  // 日換算係数
-    const double c = 350.0;     // 1車線あたりの交通容量
-    double bpr(const double &flow, const double &freecost,
-               const double &capacity);
-};
+typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, Node,
+                              Link>
+    Graph;
