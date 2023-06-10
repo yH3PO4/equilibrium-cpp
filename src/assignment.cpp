@@ -17,3 +17,13 @@ void assignment::assignment(Network &network, const std::vector<OD> &ods) {
     //     free_edgelist(edgelist); //edgelistを削除
     // }
 }
+
+void assignment::set_nearest_vertex(Network &network,
+                                    const std::vector<OD> &ods) {
+    auto rtree = network.generate_rtree();
+    for (auto&od: ods){
+        std::vector<std::pair<std::size_t, point>> res
+        rtree.query(bgi::nearest(, 1), std::back_inserter(res));
+        od.oVertexID = res[0].first;
+    }
+}

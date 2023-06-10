@@ -47,3 +47,12 @@ void Network::add_edge(const int edgeID, const int oVertexID,
         std::cout << "Failed to add edge with edge_id " << edgeID << std::endl;
     }
 }
+
+bgi::rtree<std::pair<std::size_t, point>, bgi::quadratic<16>>
+Network::generate_rtree() {
+    bgi::rtree<std::pair<std::size_t, point>, bgi::quadratic<16>> rtree;
+    for (const auto &v : this->v_desc) {
+        rtree.insert(v);
+    }
+    return rtree;
+}

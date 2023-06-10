@@ -17,6 +17,5 @@ int main() {
     Network network = io::read_network(in_vertex_path, in_edge_path);
     std::vector<OD> ods = io::read_od(od_path);
 
-    std::cout << network.alpha << std::endl;
     assignment::assignment(network, ods);
 }
