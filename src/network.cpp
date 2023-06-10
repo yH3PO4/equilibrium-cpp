@@ -9,16 +9,26 @@ Network::VertexProps::VertexProps(double _lat, double _lon) {
     this->lonlat = point(_lon, _lat);
 }
 
-Network::EdgeProps::EdgeProps() {}
+Network::EdgeProps::EdgeProps() {
+    this->flow = 0;
+    this->newflow = 0;
+    this->cost = bpr();
+    this->freecost = 0;
+    this->capacity = 0;
+}
 
 Network::EdgeProps::EdgeProps(int _laneCount, int _maxSpeed) {
     this->laneCount = _laneCount;
     this->maxSpeed = _maxSpeed;
     this->flow = 0;
     this->newflow = 0;
-    this->cost = 0;
+    this->cost = bpr();
     this->freecost = 0;
     this->capacity = 0;
+}
+
+double Network::EdgeProps::bpr() {
+    return this->freecost * (1.0 + alpha * pow((flow / capacity), beta));
 }
 
 void Network::add_vertex(const int vertexID, const VertexProps &vertex_props) {

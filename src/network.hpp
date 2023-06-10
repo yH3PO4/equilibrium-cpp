@@ -11,26 +11,31 @@ class Network {
    public:
     struct VertexProps {
         point lonlat;
-        VertexProps(); // これないとコンパイル通らない
+        VertexProps();  // これないとコンパイル通らない
         VertexProps(double _lat, double _lon);
     };
 
     struct EdgeProps {
         int laneCount, maxSpeed;
         double flow, newflow, cost, freecost, capacity;
-        EdgeProps(); // これないとコンパイル通らない
+        EdgeProps();  // これないとコンパイル通らない
         EdgeProps(int _laneCount, int _maxSpeed);
+        double bpr();
     };
 
     typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS,
                                   VertexProps, EdgeProps>
         Graph;
-    Graph graph;
+
+    static const double alpha;
+    static const double beta;
+
     void add_vertex(const int vertexID, const VertexProps &vertex_props);
     void add_edge(const int edgeID, const int oVertexID, const int dVertexID,
                   const EdgeProps &edge_props);
 
    private:
+    Graph graph;
     std::unordered_map<int, Graph::vertex_descriptor> v_desc;
     std::unordered_map<int, Graph::edge_descriptor> e_desc;
 };

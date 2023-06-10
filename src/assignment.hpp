@@ -2,5 +2,5 @@
 #include "od.hpp"
 
 namespace assignment {
-// void assignment(Graph &road_graph, const std::vector<OD> &ods);
+void assignment(Network &network, const std::vector<OD> &ods);
 }  // namespace assignment
