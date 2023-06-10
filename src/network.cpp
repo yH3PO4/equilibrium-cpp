@@ -1,14 +1,17 @@
 #include "network.hpp"
 
 #include <cmath>
+#include <iostream>
 
-Node::Node(int _nodeID, double _lat, double _lon) {
-    this->id = _nodeID;
+Network::VertexProps::VertexProps() {}
+
+Network::VertexProps::VertexProps(double _lat, double _lon) {
     this->lonlat = point(_lon, _lat);
 }
 
-Link::Link(int _id, int _laneCount, int _maxSpeed) {
-    this->id = _id;
+Network::EdgeProps::EdgeProps() {}
+
+Network::EdgeProps::EdgeProps(int _laneCount, int _maxSpeed) {
     this->laneCount = _laneCount;
     this->maxSpeed = _maxSpeed;
     this->flow = 0;
@@ -18,24 +21,19 @@ Link::Link(int _id, int _laneCount, int _maxSpeed) {
     this->capacity = 0;
 }
 
-
-std::vector<Link> Graph::shortest_path(const int &oNodeID, const int &dNodeID) {
-    return std::vector<Link>{};
+void Network::add_vertex(const int vertexID, const VertexProps &vertex_props) {
+    auto v = boost::add_vertex(vertex_props, this->graph);
+    this->v_desc[vertexID] = v;
 }
 
-void Graph::initialize_flow() {
-    for (auto &[s, links] : this->adj_list) {
-        for (auto &link : links) {
-            link.flow = 0.0;
-            link.newflow = 0.0;  // 全リンクの交通量・更新交通量を0にする
-            link.cost = this->bpr(link.flow, link.freecost,
-                                  link.capacity);  // BPR関数でコストを計算
-        }
+void Network::add_edge(const int edgeID, const int oVertexID,
+                       const int dVertexID, const EdgeProps &edge_props) {
+    auto [e, flag] =
+        boost::add_edge(this->v_desc.at(oVertexID), this->v_desc.at(dVertexID),
+                        edge_props, this->graph);
+    if (flag) {
+        this->e_desc[edgeID] = e;
+    } else {
+        std::cout << "Failed to add edge with edge_id " << edgeID << std::endl;
     }
-}
-
-double Graph::bpr(const double &flow, const double &freecost,
-                  const double &capacity) {
-    return freecost *
-           (1.0 + this->alpha * std::pow((flow / capacity), this->beta));
 }

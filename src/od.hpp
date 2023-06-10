@@ -2,9 +2,9 @@
 
 #include <unordered_map>
 
-struct NearestNode {
-    int oNode;
-    int dNode;
+struct NearestVertex {
+    int oVertex;
+    int dVertex;
 };
 
 struct OD {
@@ -13,6 +13,6 @@ struct OD {
     double dlat;
     double dlon;
     double flow;
-    NearestNode road_nearest_node;
+    NearestVertex road_nearest_vertex;
     OD(double _olat, double _olon, double _dlat, double _dlon, double _flow);
 };
