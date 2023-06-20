@@ -1,18 +1,13 @@
 #pragma once
 
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/index/rtree.hpp>
-#include <boost/graph/adjacency_list.hpp>
 #include <unordered_map>
 
-namespace bg = boost::geometry;
-namespace bgi = boost::geometry::index;
-typedef bg::model::point<double, 2, bg::cs::geographic<bg::degree>> point;
+#include "geometry.hpp"
 
 class Network {
    public:
     struct VertexProps {
-        point lonlat;
+        point_t lonlat;
         VertexProps();  // これないとコンパイル通らない
         VertexProps(double _lat, double _lon);
     };
@@ -31,13 +26,14 @@ class Network {
     static const double alpha;
     static const double beta;
 
-    void add_vertex(const int vertexID, const VertexProps &vertex_props);
-    void add_edge(const int edgeID, const int oVertexID, const int dVertexID,
+    void add_vertex(const size_t vertexID, const VertexProps &vertex_props);
+    void add_edge(const size_t edgeID, const size_t oVertexID, const size_t dVertexID,
                   const EdgeProps &edge_props);
-    bgi::rtree<std::pair<std::size_t, point>, bgi::quadratic<16>> generate_rtree();
+    bgi::rtree<std::pair<point_t, size_t>, bgi::quadratic<16>>
+     generate_rtree() const;
 
    private:
     Graph graph;
-    std::unordered_map<int, Graph::vertex_descriptor> v_desc;
-    std::unordered_map<int, Graph::edge_descriptor> e_desc;
+    std::unordered_map<size_t, Graph::vertex_descriptor> v_desc;
+    std::unordered_map<size_t, Graph::edge_descriptor> e_desc;
 };

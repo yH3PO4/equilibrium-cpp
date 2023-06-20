@@ -26,7 +26,7 @@ void io::read_vertex(const std::string &in_vertex_path, Network &network) {
     while (getline(ifs, row_str)) {
         const auto row_vec = split(row_str);
         assert(row_vec.size() == 3);
-        int vertexID = std::stoi(row_vec.at(0));
+        size_t vertexID = std::stoi(row_vec.at(0));
         double lat = std::stod(row_vec.at(1));
         double lon = std::stod(row_vec.at(2));
         network.add_vertex(vertexID, {lat, lon});
@@ -43,9 +43,9 @@ void io::read_edge(const std::string &in_edge_path, Network &network) {
     while (getline(ifs, row_str)) {
         const auto row_vec = split(row_str);
         assert(row_vec.size() == 5);
-        int edgeID = std::stoi(row_vec.at(0));
-        int oVertexID = std::stoi(row_vec.at(1));
-        int dVertexID = std::stoi(row_vec.at(2));
+        size_t edgeID = std::stoi(row_vec.at(0));
+        size_t oVertexID = std::stoi(row_vec.at(1));
+        size_t dVertexID = std::stoi(row_vec.at(2));
         int laneCount = std::stoi(row_vec.at(3));
         int maxSpeed = std::stoi(row_vec.at(4));
         network.add_edge(edgeID, oVertexID, dVertexID, {laneCount, maxSpeed});

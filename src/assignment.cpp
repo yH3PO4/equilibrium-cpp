@@ -18,12 +18,14 @@ void assignment::assignment(Network &network, const std::vector<OD> &ods) {
     // }
 }
 
-void assignment::set_nearest_vertex(Network &network,
-                                    const std::vector<OD> &ods) {
-    auto rtree = network.generate_rtree();
-    for (auto&od: ods){
-        std::vector<std::pair<std::size_t, point>> res
-        rtree.query(bgi::nearest(, 1), std::back_inserter(res));
-        od.oVertexID = res[0].first;
+void assignment::set_nearest_vertex(const Network &network, std::vector<OD> &ods) {
+    const auto rtree = network.generate_rtree();
+    for (auto &od : ods) {
+        std::vector<std::pair<point_t, size_t>> res{};
+        rtree.query(bgi::nearest(od.oPoint, 1), std::back_inserter(res));
+        od.oVertexID = res[0].second;
+        res.clear();
+        rtree.query(bgi::nearest(od.dPoint, 1), std::back_inserter(res));
+        od.dVertexID = res[0].second;
     }
 }
