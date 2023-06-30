@@ -1,4 +1,5 @@
 #include "assignment.hpp"
+#include <iostream>
 
 void assignment::assignment(Network &network, const std::vector<OD> &ods) {
     // for (const auto &od : ods) {

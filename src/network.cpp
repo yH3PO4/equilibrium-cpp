@@ -6,7 +6,7 @@
 Network::VertexProps::VertexProps() {}
 
 Network::VertexProps::VertexProps(double _lat, double _lon) {
-    this->lonlat = point_t(_lon, _lat);
+    this->lonlat = point_t(_lat, _lon);
 }
 
 Network::EdgeProps::EdgeProps() {

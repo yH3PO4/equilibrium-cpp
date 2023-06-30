@@ -9,4 +9,5 @@
 
 namespace bg = boost::geometry;
 namespace bgi = boost::geometry::index;
-typedef bg::model::point<double, 2, bg::cs::geographic<bg::degree>> point_t;
+typedef bg::model::point<double, 2, bg::cs::geographic<bg::degree>>
+    point_t;  // (lat, lon)

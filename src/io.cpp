@@ -73,7 +73,7 @@ std::vector<OD> io::read_od(const std::string &od_path) {
         const auto row_vec = split(row_str);
         assert(row_vec.size() == 5);
         double olat = std::stod(row_vec.at(0));
-        double olon = std::stoi(row_vec.at(1));
+        double olon = std::stod(row_vec.at(1));
         double dlat = std::stod(row_vec.at(2));
         double dlon = std::stod(row_vec.at(3));
         double flow = std::stod(row_vec.at(4));
