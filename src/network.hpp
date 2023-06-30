@@ -22,7 +22,7 @@ class Network {
 
     typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS,
                                   VertexProps, EdgeProps>
-        Graph;
+        graph_t;
     static const double alpha;
     static const double beta;
 
@@ -33,7 +33,7 @@ class Network {
      generate_rtree() const;
 
    private:
-    Graph graph;
-    std::unordered_map<size_t, Graph::vertex_descriptor> v_desc;
-    std::unordered_map<size_t, Graph::edge_descriptor> e_desc;
+    graph_t graph;
+    std::unordered_map<size_t, graph_t::vertex_descriptor> v_desc;
+    std::unordered_map<size_t, graph_t::edge_descriptor> e_desc;
 };
