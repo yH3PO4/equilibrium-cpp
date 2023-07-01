@@ -31,7 +31,8 @@ double Network::EdgeProps::bpr() {
     return this->freecost * (1.0 + alpha * pow((flow / capacity), beta));
 }
 
-void Network::add_vertex(const size_t vertexID, const VertexProps &vertex_props) {
+void Network::add_vertex(const size_t vertexID,
+                         const VertexProps &vertex_props) {
     auto v = boost::add_vertex(vertex_props, this->graph);
     this->v_desc[vertexID] = v;
 }
@@ -46,6 +47,32 @@ void Network::add_edge(const size_t edgeID, const size_t oVertexID,
     } else {
         std::cout << "Failed to add edge with edge_id " << edgeID << std::endl;
     }
+}
+
+Network::distance_heuristic::distance_heuristic(graph_t::vertex_descriptor goal,
+                                                graph_t &graph)
+    : goal_(goal), graph_(graph){};
+double Network::distance_heuristic::operator()(
+    graph_t::vertex_descriptor u) const {
+    // heuristic なコスト計算
+    return get(boost::vertex_index, graph_, goal_) -
+           get(boost::vertex_index, graph_, u);
+}
+
+std::vector<size_t> Network::shortest_path(const size_t oVertexID,
+                                           const size_t dVertexID) {
+    std::unordered_map<graph_t::vertex_descriptor, graph_t::vertex_descriptor>
+        parents;
+    std::unordered_map<graph_t::vertex_descriptor, double> distances;
+
+    // try {
+    //     boost::astar_search_tree(
+    //         this->graph, this->v_desc.at(oVertexID),
+    //         distance_heuristic<Graph, Cost>(goal, g),
+    //         boost::predecessor_map(&parents[0])
+    //             .distance_map(&distances[0])
+    //             .visitor(astar_goal_visitor<Vertex>(goal)));
+    // }
 }
 
 bgi::rtree<std::pair<point_t, size_t>, bgi::quadratic<16>>
