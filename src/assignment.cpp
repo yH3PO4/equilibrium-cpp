@@ -1,11 +1,11 @@
 #include "assignment.hpp"
+
 #include <iostream>
 
 void assignment::assignment(Network &network, const std::vector<OD> &ods) {
-    // for (const auto &od : ods) {
-    //     auto edges = network.shortest_path(od.road_nearest_vertex.oVertex,
-    //                                        od.road_nearest_vertex.oVertex);
-    // }
+    for (const auto &od : ods) {
+        network.update_flow(od.oVertexID, od.dVertexID);
+    }
     //     for (po = od; po != NULL; po = po->next) { //全ODについて
     //     edgelist = dijkstra(network, po->oVertex, po->dVertex);
     //     //Dijkstra法で最短経路を求めて
@@ -19,7 +19,8 @@ void assignment::assignment(Network &network, const std::vector<OD> &ods) {
     // }
 }
 
-void assignment::set_nearest_vertex(const Network &network, std::vector<OD> &ods) {
+void assignment::set_nearest_vertex(const Network &network,
+                                    std::vector<OD> &ods) {
     const auto rtree = network.generate_rtree();
     for (auto &od : ods) {
         std::vector<std::pair<point_t, size_t>> res{};
