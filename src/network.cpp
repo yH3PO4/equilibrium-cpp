@@ -59,7 +59,7 @@ Network::generate_rtree() const {
 }
 
 void Network::update_flow(const size_t oVertexID, const size_t dVertexID) {
-    shortest_path(oVertexID, dVertexID);
+    auto res = shortest_path(oVertexID, dVertexID);
 }
 
 Network::distance_heuristic::distance_heuristic(graph_t::vertex_descriptor goal,
@@ -69,8 +69,7 @@ Network::distance_heuristic::distance_heuristic(graph_t::vertex_descriptor goal,
 double Network::distance_heuristic::operator()(
     graph_t::vertex_descriptor u) const {
     // heuristic なコスト計算
-    return get(boost::vertex_index, graph_, goal_) -
-           get(boost::vertex_index, graph_, u);
+    return bg::distance(graph_[goal_].lonlat, graph_[u].lonlat);
 }
 
 Network::astar_goal_visitor::astar_goal_visitor(graph_t::vertex_descriptor goal)
@@ -83,39 +82,27 @@ void Network::astar_goal_visitor::examine_vertex(graph_t::vertex_descriptor u,
 
 std::deque<size_t> Network::shortest_path(const size_t oVertexID,
                                           const size_t dVertexID) {
-    std::unordered_map<graph_t::vertex_descriptor, graph_t::vertex_descriptor>
-        parents;
-    std::unordered_map<graph_t::vertex_descriptor, double> distances;
+    std::vector<graph_t::vertex_descriptor> parents(
+        boost::num_vertices(graph));  // これにO(N)かかるか要調査
 
     graph_t::vertex_descriptor start = this->v_desc.at(oVertexID);
     graph_t::vertex_descriptor goal = this->v_desc.at(dVertexID);
+    if (start == goal) return {};
     try {
-        boost::astar_search_tree(
-            this->graph, start, distance_heuristic(goal, graph),
-            boost::predecessor_map(&parents[0])
-                .weight_map(boost::get(&EdgeProps::cost, graph))
-                .distance_map(&distances[0])
-                .visitor(astar_goal_visitor(goal)));
-    } catch (found_goal fg) {  // found a path to the goal
-        // 経路なし
-        if (parents[goal] == goal) {
+        boost::astar_search(this->graph, start, distance_heuristic(goal, graph),
+                            boost::predecessor_map(&parents[0])
+                                .weight_map(boost::get(&EdgeProps::cost, graph))
+                                .visitor(astar_goal_visitor(goal)));
+    } catch (found_goal fg) {
+        if (parents.at(goal) == goal) {
             std::cout << "no path" << std::endl;
             return {};
         }
-
-        // 最短経路の頂点リストを作成
         std::deque<graph_t::vertex_descriptor> route;
         for (graph_t::vertex_descriptor v = goal; v != start; v = parents[v]) {
             route.push_front(v);
         }
         route.push_front(start);
-
-        // 最短経路を出力
-        for (const graph_t::vertex_descriptor v : route) {
-            std::cout << graph[v].lonlat.get<0>() << " "
-                      << graph[v].lonlat.get<1>() << " ";
-        }
-        std::cout << std::endl;
         return route;
     }
 }
