@@ -54,12 +54,13 @@ class Network {
                   const size_t dVertexID, const EdgeProps& edge_props);
     bgi::rtree<std::pair<point_t, size_t>, bgi::quadratic<16>> generate_rtree()
         const;
-    void update_flow(const size_t oVertexID, const size_t dVertexID);
+    void update_flow(const size_t oVertexID, const size_t dVertexID,
+                     const double flow);
 
    private:
     graph_t graph;
     std::unordered_map<size_t, graph_t::vertex_descriptor> v_desc;
     std::unordered_map<size_t, graph_t::edge_descriptor> e_desc;
-    std::deque<size_t> shortest_path(
-        const size_t oVertexID, const size_t dVertexID);
+    std::vector<graph_t::edge_descriptor> shortest_path(const size_t oVertexID,
+                                                        const size_t dVertexID);
 };

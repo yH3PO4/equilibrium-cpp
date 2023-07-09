@@ -58,8 +58,11 @@ Network::generate_rtree() const {
     return rtree;
 }
 
-void Network::update_flow(const size_t oVertexID, const size_t dVertexID) {
-    auto res = shortest_path(oVertexID, dVertexID);
+void Network::update_flow(const size_t oVertexID, const size_t dVertexID,
+                          const double flow) {
+    std::vector<graph_t::edge_descriptor> path =
+        shortest_path(oVertexID, dVertexID);
+    for (const auto e : path) graph[e].newflow += flow;
 }
 
 Network::distance_heuristic::distance_heuristic(graph_t::vertex_descriptor goal,
@@ -80,8 +83,8 @@ void Network::astar_goal_visitor::examine_vertex(graph_t::vertex_descriptor u,
     if (u == m_goal) throw found_goal();
 }
 
-std::deque<size_t> Network::shortest_path(const size_t oVertexID,
-                                          const size_t dVertexID) {
+std::vector<Network::graph_t::edge_descriptor> Network::shortest_path(
+    const size_t oVertexID, const size_t dVertexID) {
     std::vector<graph_t::vertex_descriptor> parents(
         boost::num_vertices(graph));  // これにO(N)かかるか要調査
 
@@ -95,14 +98,22 @@ std::deque<size_t> Network::shortest_path(const size_t oVertexID,
                                 .visitor(astar_goal_visitor(goal)));
     } catch (found_goal fg) {
         if (parents.at(goal) == goal) {
-            std::cout << "no path" << std::endl;
+            std::cout << "経路が存在しません" << std::endl;
             return {};
         }
-        std::deque<graph_t::vertex_descriptor> route;
-        for (graph_t::vertex_descriptor v = goal; v != start; v = parents[v]) {
-            route.push_front(v);
+        std::vector<graph_t::edge_descriptor> route;
+        graph_t::vertex_descriptor v = goal;
+        while (v != start) {
+            graph_t::vertex_descriptor p = parents.at(v);
+            auto [e, flag] = boost::edge(p, v, graph);
+            if (!flag) {
+                std::cout << "経路復元に失敗しました" << std::endl;
+                return {};
+            }
+            route.push_back(e);
+            v = p;
         }
-        route.push_front(start);
+        std::reverse(route.begin(), route.end());  // 起点->終点ｎ
         return route;
     }
 }

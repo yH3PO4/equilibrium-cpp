@@ -4,7 +4,7 @@
 
 void assignment::assignment(Network &network, const std::vector<OD> &ods) {
     for (const auto &od : ods) {
-        network.update_flow(od.oVertexID, od.dVertexID);
+        network.update_flow(od.oVertexID, od.dVertexID, od.flow);
     }
     //     for (po = od; po != NULL; po = po->next) { //全ODについて
     //     edgelist = dijkstra(network, po->oVertex, po->dVertex);
