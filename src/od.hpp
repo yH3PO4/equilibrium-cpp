@@ -1,18 +1,13 @@
 #pragma once
-
 #include <unordered_map>
 
-struct NearestNode {
-    int oNode;
-    int dNode;
-};
+#include "geometry.hpp"
 
 struct OD {
-    double olat;
-    double olon;
-    double dlat;
-    double dlon;
+    point_t oPoint;
+    point_t dPoint;
     double flow;
-    NearestNode road_nearest_node;
+    size_t oVertexID;
+    size_t dVertexID;
     OD(double _olat, double _olon, double _dlat, double _dlon, double _flow);
 };

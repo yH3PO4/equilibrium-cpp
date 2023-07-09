@@ -1,35 +1,65 @@
 #pragma once
 
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/astar_search.hpp>
 #include <unordered_map>
-#include <vector>
 
-struct Node {
-    int id;
-    double lon, lat;
-    Node(int _nodeID, double _lat, double _lon);
-};
+#include "geometry.hpp"
 
-struct Link {
-    int id, oNodeID, dNodeID, laneCount, maxSpeed;
-    double flow, newflow, cost, freecost, capacity;
-    Link(int _id, int _oNodeID, int _dNodeID, int _laneCount, int _maxSpeed);
-};
-
-class Graph {
+class Network {
    public:
-    std::unordered_map<int, Node> nodes;
-    // directed graph
-    std::unordered_map<int, std::vector<Link>> adj_list;
+    struct VertexProps {
+        point_t lonlat;
+        VertexProps();  // これないとコンパイル通らない
+        VertexProps(double _lat, double _lon);
+    };
 
-    Graph(std::vector<Node> nodes, std::vector<Link> links);
-    std::vector<Link> shortest_path(const int &oNodeID, const int &dNodeID);
-    void initialize_flow();
+    struct EdgeProps {
+        int laneCount, maxSpeed;
+        double flow, newflow, cost, freecost, capacity;
+        EdgeProps();  // これないとコンパイル通らない
+        EdgeProps(int _laneCount, int _maxSpeed);
+        double bpr();
+    };
+    typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS,
+                                  VertexProps, EdgeProps>
+        graph_t;
+
+    class distance_heuristic : public boost::astar_heuristic<graph_t, double> {
+       public:
+        distance_heuristic(graph_t::vertex_descriptor goal, graph_t& graph);
+        double operator()(graph_t::vertex_descriptor u) const;
+
+       private:
+        graph_t::vertex_descriptor goal_;
+        graph_t& graph_;
+    };
+
+    class astar_goal_visitor : public boost::default_astar_visitor {
+       public:
+        astar_goal_visitor(graph_t::vertex_descriptor goal);
+        void examine_vertex(graph_t::vertex_descriptor u, const graph_t& g);
+
+       private:
+        graph_t::vertex_descriptor m_goal;
+    };
+
+    struct found_goal {};
+
+    static const double alpha;
+    static const double beta;
+
+    void add_vertex(const size_t vertexID, const VertexProps& vertex_props);
+    void add_edge(const size_t edgeID, const size_t oVertexID,
+                  const size_t dVertexID, const EdgeProps& edge_props);
+    bgi::rtree<std::pair<point_t, size_t>, bgi::quadratic<16>> generate_rtree()
+        const;
+    void update_flow(const size_t oVertexID, const size_t dVertexID);
 
    private:
-    const double alpha = 0.48;  // BPR関数のパラメータ
-    const double beta = 2.52;   // BPR関数のパラメータ
-    const double gamma = 16.0;  // 日換算係数
-    const double c = 350.0;     // 1車線あたりの交通容量
-    double bpr(const double &flow, const double &freecost,
-               const double &capacity);
+    graph_t graph;
+    std::unordered_map<size_t, graph_t::vertex_descriptor> v_desc;
+    std::unordered_map<size_t, graph_t::edge_descriptor> e_desc;
+    std::deque<size_t> shortest_path(
+        const size_t oVertexID, const size_t dVertexID);
 };
