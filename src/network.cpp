@@ -28,7 +28,12 @@ Network::EdgeProps::EdgeProps(int _laneCount, int _maxSpeed) {
 }
 
 double Network::EdgeProps::bpr() {
-    return this->freecost * (1.0 + alpha * pow((flow / capacity), beta));
+    return this->freecost *
+           (1.0 + alpha * pow((this->flow / this->capacity), beta));
+}
+
+double Network::EdgeProps::bpr(double _flow) {
+    return this->freecost * (1.0 + alpha * pow((_flow / this->capacity), beta));
 }
 
 void Network::add_vertex(const size_t vertexID,
@@ -58,11 +63,54 @@ Network::generate_rtree() const {
     return rtree;
 }
 
-void Network::update_flow(const size_t oVertexID, const size_t dVertexID,
-                          const double flow) {
+void Network::all_or_nothing(const size_t oVertexID, const size_t dVertexID,
+                             const double flow) {
     std::vector<graph_t::edge_descriptor> path =
         shortest_path(oVertexID, dVertexID);
     for (const auto e : path) graph[e].newflow += flow;
+}
+
+void Network::update_all_flow() {
+    auto edges = boost::edges(graph);
+    for (auto eit = edges.first; eit != edges.second; ++eit) {
+        // iterate all edges
+        Network::EdgeProps &edge = graph[*eit];
+        edge.flow = edge.newflow;
+        edge.cost = edge.bpr();
+    }
+}
+
+double Network::calc_z(double xi) {
+    // z を計算する
+    double z = 0.0;
+    auto edges = boost::edges(graph);
+    for (auto eit = edges.first; eit != edges.second; ++eit) {
+        // iterate all edges
+        Network::EdgeProps &edge = graph[*eit];
+        double cost = edge.bpr(edge.flow * xi + edge.newflow * (1 - xi));
+        z += cost * (edge.flow * xi + edge.newflow * (1 - xi));
+    }
+    return z;
+}
+
+double Network::update_optimal_flow(double minxi) {
+    // リンクの交通量とコストを更新、収束判定値delta計算
+    double delta = 0.0;
+    auto edges = boost::edges(graph);
+    for (auto eit = edges.first; eit != edges.second; ++eit) {
+        // iterate all edges
+        Network::EdgeProps &edge = graph[*eit];
+        delta += abs(
+            edge.flow * minxi + (edge.newflow) * (1 - minxi) -
+            edge.flow);  // 最適な交通量から最初の交通量を引いた値の絶対値を足す
+        edge.cost = edge.bpr(
+            edge.flow * minxi +
+            edge.newflow *
+                (1 - minxi));  // 最適な交通量のときのリンクのコストを計算
+        edge.newflow =
+            edge.flow * minxi +
+            edge.newflow * (1 - minxi);  // 最適な交通量を更新交通量に代入
+    }
 }
 
 Network::distance_heuristic::distance_heuristic(graph_t::vertex_descriptor goal,

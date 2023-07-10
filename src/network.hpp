@@ -20,6 +20,7 @@ class Network {
         EdgeProps();  // これないとコンパイル通らない
         EdgeProps(int _laneCount, int _maxSpeed);
         double bpr();
+        double bpr(double _flow);
     };
     typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS,
                                   VertexProps, EdgeProps>
@@ -54,8 +55,11 @@ class Network {
                   const size_t dVertexID, const EdgeProps& edge_props);
     bgi::rtree<std::pair<point_t, size_t>, bgi::quadratic<16>> generate_rtree()
         const;
-    void update_flow(const size_t oVertexID, const size_t dVertexID,
-                     const double flow);
+    void all_or_nothing(const size_t oVertexID, const size_t dVertexID,
+                        const double flow);
+    void update_all_flow();
+    double calc_z(double xi);
+    double update_optimal_flow(double minxi);
 
    private:
     graph_t graph;
