@@ -56,17 +56,17 @@ const double Network::calc_length(int oVertexID, int dVertexID) {
         oVertex = this->v_desc.at(oVertexID);
     } catch (std::out_of_range &ex) {
         std::cout << oVertexID << " is not in graph" << std::endl;
-        return;
+        return 0;
     }
     try {
         dVertex = this->v_desc.at(dVertexID);
     } catch (std::out_of_range &ex) {
         std::cout << dVertexID << " is not in graph" << std::endl;
-        return;
+        return 0;
     }
 
-    double length = boost::distance(this->graph[oVertex].lonlat,
-                                    this->graph[dVertex].lonlat);
+    double length =
+        bg::distance(this->graph[oVertex].lonlat, this->graph[dVertex].lonlat);
     return length;
 }
 
@@ -83,7 +83,7 @@ void Network::all_or_nothing(const size_t oVertexID, const size_t dVertexID,
                              const double flow) {
     std::vector<graph_t::edge_descriptor> path =
         shortest_path(oVertexID, dVertexID);
-    for (const auto e : path) graph[e].newflow += flow;
+    for (const auto &e : path) graph[e].newflow += flow;
 }
 
 void Network::update_all_flow() {
@@ -128,6 +128,7 @@ double Network::update_optimal_flow(double minxi) {
             edge.flow * minxi +
             edge.newflow * (1 - minxi);  // 最適な交通量を更新交通量に代入
     }
+    return delta;
 }
 
 Network::distance_heuristic::distance_heuristic(graph_t::vertex_descriptor goal,
@@ -181,4 +182,6 @@ std::vector<Network::graph_t::edge_descriptor> Network::shortest_path(
         std::reverse(route.begin(), route.end());  // 起点->終点ｎ
         return route;
     }
+    std::cout << "経路が存在しません" << std::endl;
+    return {};
 }

@@ -49,7 +49,7 @@ void io::read_edge(const std::string &in_edge_path, Network &network) {
         int laneCount = std::stoi(row_vec.at(3));
         int maxSpeed = std::stoi(row_vec.at(4));
         double length = network.calc_length(oVertexID, dVertexID);
-        network.add_edge(edgeID, oVertexID, dVertexID, {length, laneCount, maxSpeed});
+        network.add_edge(edgeID, oVertexID, dVertexID, {laneCount, maxSpeed, length});
     }
 }
 

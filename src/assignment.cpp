@@ -35,8 +35,8 @@ void assignment::assignment(Network &network, const std::vector<OD> &ods) {
                 xi4 = (xi1 * 1.0 + xi2 * GR) / (1.0 + GR);
             }
         }
-        double minxi = xi2; //最小になるときのxi
-        double minz = network.calc_z(minxi); //最小になるときの目的関数
+        double minxi = xi2;                   // 最小になるときのxi
+        double minz = network.calc_z(minxi);  // 最小になるときの目的関数
         delta = network.update_optimal_flow(minxi);
         std::cout << delta << " " << minz << std::endl;
     }
