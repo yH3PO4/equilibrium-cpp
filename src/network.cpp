@@ -9,22 +9,18 @@ Network::VertexProps::VertexProps(double _lat, double _lon) {
     this->lonlat = point_t(_lat, _lon);
 }
 
-Network::EdgeProps::EdgeProps() {
-    this->flow = 0;
-    this->newflow = 0;
-    this->freecost = 1;  // TODO: 距離計算
-    this->cost = bpr();
-    this->capacity = 0;
-}
+Network::EdgeProps::EdgeProps() {}
 
-Network::EdgeProps::EdgeProps(int _laneCount, int _maxSpeed) {
+Network::EdgeProps::EdgeProps(int _laneCount, int _maxSpeed, double _length) {
     this->laneCount = _laneCount;
     this->maxSpeed = _maxSpeed;
+    this->length = _length;
+    this->capacity = _laneCount * gamma * c;
     this->flow = 0;
     this->newflow = 0;
-    this->cost = 0;
-    this->freecost = 0;
-    this->capacity = 0;
+    // リンクの長さと制限速度から自由旅行時間を計算して格納
+    this->cost = (_length / (_maxSpeed / 3.6)) / 60;
+    this->freecost = (_length / (_maxSpeed / 3.6)) / 60;
 }
 
 double Network::EdgeProps::bpr() {
@@ -45,13 +41,33 @@ void Network::add_vertex(const size_t vertexID,
 void Network::add_edge(const size_t edgeID, const size_t oVertexID,
                        const size_t dVertexID, const EdgeProps &edge_props) {
     auto [e, flag] =
-        boost::add_edge(this->v_desc.at(oVertexID), this->v_desc.at(dVertexID),
+        boost::add_edge(this->v_desc.at(oVertexID), this->v_desc.at(oVertexID),
                         edge_props, this->graph);
     if (flag) {
         this->e_desc[edgeID] = e;
     } else {
         std::cout << "Failed to add edge with edge_id " << edgeID << std::endl;
     }
+}
+
+const double Network::calc_length(int oVertexID, int dVertexID) {
+    graph_t::vertex_descriptor oVertex, dVertex;
+    try {
+        oVertex = this->v_desc.at(oVertexID);
+    } catch (std::out_of_range &ex) {
+        std::cout << oVertexID << " is not in graph" << std::endl;
+        return;
+    }
+    try {
+        dVertex = this->v_desc.at(dVertexID);
+    } catch (std::out_of_range &ex) {
+        std::cout << dVertexID << " is not in graph" << std::endl;
+        return;
+    }
+
+    double length = boost::distance(this->graph[oVertex].lonlat,
+                                    this->graph[dVertex].lonlat);
+    return length;
 }
 
 bgi::rtree<std::pair<point_t, size_t>, bgi::quadratic<16>>
@@ -77,6 +93,7 @@ void Network::update_all_flow() {
         Network::EdgeProps &edge = graph[*eit];
         edge.flow = edge.newflow;
         edge.cost = edge.bpr();
+        edge.newflow = 0.0;
     }
 }
 

@@ -13,12 +13,12 @@ class Network {
         VertexProps();  // これないとコンパイル通らない
         VertexProps(double _lat, double _lon);
     };
-
     struct EdgeProps {
         int laneCount, maxSpeed;
-        double flow, newflow, cost, freecost, capacity;
+        double length, capacity;
+        double flow, newflow, cost, freecost;
         EdgeProps();  // これないとコンパイル通らない
-        EdgeProps(int _laneCount, int _maxSpeed);
+        EdgeProps(int _laneCount, int _maxSpeed, double _length);
         double bpr();
         double bpr(double _flow);
     };
@@ -49,10 +49,13 @@ class Network {
 
     static const double alpha;
     static const double beta;
+    static const double gamma;
+    static const double c;
 
     void add_vertex(const size_t vertexID, const VertexProps& vertex_props);
     void add_edge(const size_t edgeID, const size_t oVertexID,
                   const size_t dVertexID, const EdgeProps& edge_props);
+    const double calc_length(int oVertexID, int dVertexID);
     bgi::rtree<std::pair<point_t, size_t>, bgi::quadratic<16>> generate_rtree()
         const;
     void all_or_nothing(const size_t oVertexID, const size_t dVertexID,
