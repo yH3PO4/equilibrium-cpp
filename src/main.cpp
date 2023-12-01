@@ -13,6 +13,7 @@ int main() {
     const std::string in_vertex_path = "Input_data/Tokyo/TokyoNode.csv";
     const std::string in_edge_path = "Input_data/Tokyo/TokyoLink.csv";
     const std::string od_path = "Input_data/Tokyo/TokyoOD.csv";
+    const std::string output_path = "Output_data/Tokyo/TokyoLinkFlow.csv";
 
     Network network = io::read_network(in_vertex_path, in_edge_path);
     std::vector<OD> ods = io::read_od(od_path);
@@ -21,4 +22,5 @@ int main() {
     std::cout << "Number of OD pairs: " << ods.size() << std::endl;
     assignment::set_nearest_vertex(network, ods);
     assignment::assignment(network, ods);
+    io::output_flow(output_path, network);
 }

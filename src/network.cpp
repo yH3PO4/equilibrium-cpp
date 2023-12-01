@@ -190,7 +190,7 @@ std::vector<Network::graph_t::edge_descriptor> Network::shortest_path(
     return {};
 }
 
-void Network::set_result(){
+void Network::set_result() {
     auto edges = boost::edges(graph);
     for (auto eit = edges.first; eit != edges.second; ++eit) {
         // iterate all edges
@@ -198,4 +198,18 @@ void Network::set_result(){
         edge.flow = edge.newflow;
         edge.cost = edge.bpr();
     }
+}
+
+const std::vector<std::tuple<int, double, double, double, double, double>> 
+Network::get_link_flow() const {
+    std::vector<std::tuple<int, double, double, double, double, double>> res;
+    for (const auto &[edge_ID, e] : this->e_desc) {
+        double oLat = this->graph[e.m_source].lonlat.get<0>();
+        double oLon = this->graph[e.m_source].lonlat.get<1>();
+        double dLat = this->graph[e.m_target].lonlat.get<0>();
+        double dLon = this->graph[e.m_target].lonlat.get<1>();
+        double flow = this->graph[e].flow;
+        res.emplace_back(edge_ID, oLat, oLon, dLat, dLon, flow);
+    }
+    return res;
 }
