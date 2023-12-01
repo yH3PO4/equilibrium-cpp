@@ -5,13 +5,16 @@
 
 Network::VertexProps::VertexProps() {}
 
-Network::VertexProps::VertexProps(double _lat, double _lon) {
+Network::VertexProps::VertexProps(size_t vertexID, double _lat, double _lon) {
+    this->outerID = vertexID;
     this->lonlat = point_t(_lat, _lon);
 }
 
 Network::EdgeProps::EdgeProps() {}
 
-Network::EdgeProps::EdgeProps(int _laneCount, int _maxSpeed, double _length) {
+Network::EdgeProps::EdgeProps(size_t edgeID, int _laneCount, int _maxSpeed,
+                              double _length) {
+    this->outerID = edgeID;
     this->laneCount = _laneCount;
     this->maxSpeed = _maxSpeed;
     this->length = _length;
@@ -32,21 +35,21 @@ double Network::EdgeProps::bpr(double _flow) {
     return this->freecost * (1.0 + alpha * pow((_flow / this->capacity), beta));
 }
 
-void Network::add_vertex(const size_t vertexID,
-                         const VertexProps &vertex_props) {
+void Network::add_vertex(const VertexProps &vertex_props) {
     auto v = boost::add_vertex(vertex_props, this->graph);
-    this->v_desc[vertexID] = v;
+    this->v_desc[vertex_props.outerID] = v;
 }
 
-void Network::add_edge(const size_t edgeID, const size_t oVertexID,
-                       const size_t dVertexID, const EdgeProps &edge_props) {
+void Network::add_edge(const size_t oVertexID, const size_t dVertexID,
+                       const EdgeProps &edge_props) {
     auto [e, flag] =
         boost::add_edge(this->v_desc.at(oVertexID), this->v_desc.at(dVertexID),
                         edge_props, this->graph);
     if (flag) {
-        this->e_desc[edgeID] = e;
+        this->e_desc[edge_props.outerID] = e;
     } else {
-        std::cout << "Failed to add edge with edge_id " << edgeID << std::endl;
+        std::cout << "Failed to add edge with edge_id " << edge_props.outerID
+                  << std::endl;
     }
 }
 
@@ -200,16 +203,24 @@ void Network::set_result() {
     }
 }
 
-const std::vector<std::tuple<int, double, double, double, double, double>> 
+const std::vector<
+    std::tuple<int, int, double, double, int, double, double, double>>
 Network::get_link_flow() const {
-    std::vector<std::tuple<int, double, double, double, double, double>> res;
-    for (const auto &[edge_ID, e] : this->e_desc) {
-        double oLat = this->graph[e.m_source].lonlat.get<0>();
-        double oLon = this->graph[e.m_source].lonlat.get<1>();
-        double dLat = this->graph[e.m_target].lonlat.get<0>();
-        double dLon = this->graph[e.m_target].lonlat.get<1>();
-        double flow = this->graph[e].flow;
-        res.emplace_back(edge_ID, oLat, oLon, dLat, dLon, flow);
+    std::vector<
+        std::tuple<int, int, double, double, int, double, double, double>>
+        res;
+    for (const auto &[edge_ID, edge] : this->e_desc) {
+        const VertexProps &source = this->graph[edge.m_source];
+        const VertexProps &target = this->graph[edge.m_target];
+        const double oVertexID = source.outerID;
+        const double oLat = source.lonlat.get<0>();
+        const double oLon = source.lonlat.get<1>();
+        const double dVertexID = target.outerID;
+        const double dLat = target.lonlat.get<0>();
+        const double dLon = target.lonlat.get<1>();
+        const double flow = this->graph[edge].flow;
+        res.emplace_back(edge_ID, oVertexID, oLat, oLon, dVertexID, dLat,
+                         dLon, flow);
     }
     return res;
 }

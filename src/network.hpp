@@ -9,16 +9,18 @@
 class Network {
    public:
     struct VertexProps {
+        int outerID;
         point_t lonlat;
         VertexProps();  // これないとコンパイル通らない
-        VertexProps(double _lat, double _lon);
+        VertexProps(size_t vertexID, double _lat, double _lon);
     };
     struct EdgeProps {
+        int outerID;
         int laneCount, maxSpeed;
         double length, capacity;
         double flow, newflow, cost, freecost;
         EdgeProps();  // これないとコンパイル通らない
-        EdgeProps(int _laneCount, int _maxSpeed, double _length);
+        EdgeProps(size_t edgeID, int _laneCount, int _maxSpeed, double _length);
         double bpr();
         double bpr(double _flow);
     };
@@ -52,9 +54,9 @@ class Network {
     static const double gamma;
     static const double c;
 
-    void add_vertex(const size_t vertexID, const VertexProps& vertex_props);
-    void add_edge(const size_t edgeID, const size_t oVertexID,
-                  const size_t dVertexID, const EdgeProps& edge_props);
+    void add_vertex(const VertexProps& vertex_props);
+    void add_edge(const size_t oVertexID, const size_t dVertexID,
+                  const EdgeProps& edge_props);
     int num_vertices();
     int num_edges();
     const double calc_length(int oVertexID, int dVertexID);
@@ -66,7 +68,8 @@ class Network {
     double calc_z(double xi);
     double update_optimal_flow(double minxi);
     void set_result();
-    const std::vector<std::tuple<int, double, double, double, double, double>> get_link_flow() const;
+    const std::vector<std::tuple<int, int, double, double, int, double, double, double>>
+    get_link_flow() const;
 
    private:
     graph_t graph;
