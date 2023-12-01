@@ -23,7 +23,7 @@ void assignment::assignment(Network &network, const std::vector<OD> &ods) {
         double xi2 = 1.0;
         double xi3 = (xi1 * GR + xi2 * 1.0) / (1.0 + GR);
         double xi4 = (xi1 * 1.0 + xi2 * GR) / (1.0 + GR);
-        while (abs(xi1 - xi2) > THRES_XI) {
+        while (std::abs(xi1 - xi2) > THRES_XI) {
             if (network.calc_z(xi3) < network.calc_z(xi4)) {
                 xi2 = xi4;
                 xi4 = xi3;

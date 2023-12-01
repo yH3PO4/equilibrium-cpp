@@ -21,8 +21,8 @@ class Network {
         double flow, newflow, cost, freecost;
         EdgeProps();  // これないとコンパイル通らない
         EdgeProps(size_t edgeID, int _laneCount, int _maxSpeed, double _length);
-        double bpr();
-        double bpr(double _flow);
+        double bpr() const;
+        double bpr(double _flow) const;
     };
     typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS,
                                   VertexProps, EdgeProps>
@@ -30,12 +30,13 @@ class Network {
 
     class distance_heuristic : public boost::astar_heuristic<graph_t, double> {
        public:
-        distance_heuristic(graph_t::vertex_descriptor goal, graph_t& graph);
+        distance_heuristic(const graph_t::vertex_descriptor goal,
+                           const graph_t& graph);
         double operator()(graph_t::vertex_descriptor u) const;
 
        private:
-        graph_t::vertex_descriptor goal_;
-        graph_t& graph_;
+        const graph_t::vertex_descriptor goal_;
+        const graph_t& graph_;
     };
 
     class astar_goal_visitor : public boost::default_astar_visitor {
@@ -57,24 +58,24 @@ class Network {
     void add_vertex(const VertexProps& vertex_props);
     void add_edge(const size_t oVertexID, const size_t dVertexID,
                   const EdgeProps& edge_props);
-    int num_vertices();
-    int num_edges();
-    const double calc_length(int oVertexID, int dVertexID);
+    int num_vertices() const;
+    int num_edges() const;
+    double calc_length(int oVertexID, int dVertexID) const;
     bgi::rtree<std::pair<point_t, size_t>, bgi::quadratic<16>> generate_rtree()
         const;
     void all_or_nothing(const size_t oVertexID, const size_t dVertexID,
                         const double flow);
     void update_all_flow();
-    double calc_z(double xi);
+    double calc_z(double xi) const;
     double update_optimal_flow(double minxi);
     void set_result();
-    const std::vector<std::tuple<int, int, double, double, int, double, double, double>>
+    std::vector<std::tuple<VertexProps, VertexProps, EdgeProps>>
     get_link_flow() const;
 
    private:
     graph_t graph;
     std::unordered_map<size_t, graph_t::vertex_descriptor> v_desc;
     std::unordered_map<size_t, graph_t::edge_descriptor> e_desc;
-    std::vector<graph_t::edge_descriptor> shortest_path(const size_t oVertexID,
-                                                        const size_t dVertexID);
+    std::vector<graph_t::edge_descriptor> shortest_path(size_t oVertexID,
+                                                        size_t dVertexID) const;
 };

@@ -26,23 +26,23 @@ Network::EdgeProps::EdgeProps(size_t edgeID, int _laneCount, int _maxSpeed,
     this->freecost = (_length / (_maxSpeed / 3.6)) / 60;
 }
 
-double Network::EdgeProps::bpr() {
+double Network::EdgeProps::bpr() const {
     return this->freecost *
            (1.0 + alpha * pow((this->flow / this->capacity), beta));
 }
 
-double Network::EdgeProps::bpr(double _flow) {
+double Network::EdgeProps::bpr(double _flow) const {
     return this->freecost * (1.0 + alpha * pow((_flow / this->capacity), beta));
 }
 
 void Network::add_vertex(const VertexProps &vertex_props) {
-    auto v = boost::add_vertex(vertex_props, this->graph);
+    const auto v = boost::add_vertex(vertex_props, this->graph);
     this->v_desc[vertex_props.outerID] = v;
 }
 
 void Network::add_edge(const size_t oVertexID, const size_t dVertexID,
                        const EdgeProps &edge_props) {
-    auto [e, flag] =
+    const auto [e, flag] =
         boost::add_edge(this->v_desc.at(oVertexID), this->v_desc.at(dVertexID),
                         edge_props, this->graph);
     if (flag) {
@@ -53,11 +53,11 @@ void Network::add_edge(const size_t oVertexID, const size_t dVertexID,
     }
 }
 
-int Network::num_vertices() { return boost::num_vertices(this->graph); }
+int Network::num_vertices() const { return boost::num_vertices(this->graph); }
 
-int Network::num_edges() { return boost::num_edges(this->graph); }
+int Network::num_edges() const { return boost::num_edges(this->graph); }
 
-const double Network::calc_length(int oVertexID, int dVertexID) {
+double Network::calc_length(int oVertexID, int dVertexID) const {
     graph_t::vertex_descriptor oVertex, dVertex;
     try {
         oVertex = this->v_desc.at(oVertexID);
@@ -94,24 +94,22 @@ void Network::all_or_nothing(const size_t oVertexID, const size_t dVertexID,
 }
 
 void Network::update_all_flow() {
-    auto edges = boost::edges(graph);
-    for (auto eit = edges.first; eit != edges.second; ++eit) {
+    for (const auto &e : boost::make_iterator_range(boost::edges(graph))) {
         // iterate all edges
-        Network::EdgeProps &edge = graph[*eit];
+        Network::EdgeProps &edge = graph[e];
         edge.flow = edge.newflow;
         edge.cost = edge.bpr();
         edge.newflow = 0.0;
     }
 }
 
-double Network::calc_z(double xi) {
+double Network::calc_z(double xi) const {
     // z を計算する
     double z = 0.0;
-    auto edges = boost::edges(graph);
-    for (auto eit = edges.first; eit != edges.second; ++eit) {
+    for (const auto &e : boost::make_iterator_range(boost::edges(graph))) {
         // iterate all edges
-        Network::EdgeProps &edge = graph[*eit];
-        double cost = edge.bpr(edge.flow * xi + edge.newflow * (1 - xi));
+        const Network::EdgeProps &edge = graph[e];
+        const double cost = edge.bpr(edge.flow * xi + edge.newflow * (1 - xi));
         z += cost * (edge.flow * xi + edge.newflow * (1 - xi));
     }
     return z;
@@ -120,11 +118,10 @@ double Network::calc_z(double xi) {
 double Network::update_optimal_flow(double minxi) {
     // リンクの交通量とコストを更新、収束判定値delta計算
     double delta = 0.0;
-    auto edges = boost::edges(graph);
-    for (auto eit = edges.first; eit != edges.second; ++eit) {
+    for (const auto &e : boost::make_iterator_range(boost::edges(graph))) {
         // iterate all edges
-        Network::EdgeProps &edge = graph[*eit];
-        delta += abs(
+        Network::EdgeProps &edge = graph[e];
+        delta += std::abs(
             edge.flow * minxi + (edge.newflow) * (1 - minxi) -
             edge.flow);  // 最適な交通量から最初の交通量を引いた値の絶対値を足す
         edge.cost = edge.bpr(
@@ -138,8 +135,8 @@ double Network::update_optimal_flow(double minxi) {
     return delta;
 }
 
-Network::distance_heuristic::distance_heuristic(graph_t::vertex_descriptor goal,
-                                                graph_t &graph)
+Network::distance_heuristic::distance_heuristic(
+    const graph_t::vertex_descriptor goal, const graph_t &graph)
     : goal_(goal), graph_(graph){};
 
 double Network::distance_heuristic::operator()(
@@ -157,12 +154,12 @@ void Network::astar_goal_visitor::examine_vertex(graph_t::vertex_descriptor u,
 }
 
 std::vector<Network::graph_t::edge_descriptor> Network::shortest_path(
-    const size_t oVertexID, const size_t dVertexID) {
+    size_t oVertexID, size_t dVertexID) const {
     std::vector<graph_t::vertex_descriptor> parents(
         boost::num_vertices(graph));  // これにO(N)かかるか要調査
 
-    graph_t::vertex_descriptor start = this->v_desc.at(oVertexID);
-    graph_t::vertex_descriptor goal = this->v_desc.at(dVertexID);
+    const graph_t::vertex_descriptor start = this->v_desc.at(oVertexID);
+    const graph_t::vertex_descriptor goal = this->v_desc.at(dVertexID);
     if (start == goal) return {};
     try {
         boost::astar_search(this->graph, start, distance_heuristic(goal, graph),
@@ -178,7 +175,7 @@ std::vector<Network::graph_t::edge_descriptor> Network::shortest_path(
         graph_t::vertex_descriptor v = goal;
         while (v != start) {
             graph_t::vertex_descriptor p = parents.at(v);
-            auto [e, flag] = boost::edge(p, v, graph);
+            const auto [e, flag] = boost::edge(p, v, graph);
             if (!flag) {
                 std::cout << "経路復元に失敗しました" << std::endl;
                 return {};
@@ -194,33 +191,22 @@ std::vector<Network::graph_t::edge_descriptor> Network::shortest_path(
 }
 
 void Network::set_result() {
-    auto edges = boost::edges(graph);
-    for (auto eit = edges.first; eit != edges.second; ++eit) {
+    for (const auto &e : boost::make_iterator_range(boost::edges(graph))) {
         // iterate all edges
-        Network::EdgeProps &edge = graph[*eit];
+        Network::EdgeProps &edge = graph[e];
         edge.flow = edge.newflow;
         edge.cost = edge.bpr();
     }
 }
 
-const std::vector<
-    std::tuple<int, int, double, double, int, double, double, double>>
+std::vector<
+    std::tuple<Network::VertexProps, Network::VertexProps, Network::EdgeProps>>
 Network::get_link_flow() const {
-    std::vector<
-        std::tuple<int, int, double, double, int, double, double, double>>
-        res;
-    for (const auto &[edge_ID, edge] : this->e_desc) {
-        const VertexProps &source = this->graph[edge.m_source];
-        const VertexProps &target = this->graph[edge.m_target];
-        const double oVertexID = source.outerID;
-        const double oLat = source.lonlat.get<0>();
-        const double oLon = source.lonlat.get<1>();
-        const double dVertexID = target.outerID;
-        const double dLat = target.lonlat.get<0>();
-        const double dLon = target.lonlat.get<1>();
-        const double flow = this->graph[edge].flow;
-        res.emplace_back(edge_ID, oVertexID, oLat, oLon, dVertexID, dLat,
-                         dLon, flow);
+    std::vector<std::tuple<VertexProps, VertexProps, EdgeProps>> res;
+    for (const auto &e : boost::make_iterator_range(boost::edges(graph))) {
+        const VertexProps &source = this->graph[e.m_source];
+        const VertexProps &target = this->graph[e.m_target];
+        res.emplace_back(source, target, graph[e]);
     }
     return res;
 }
