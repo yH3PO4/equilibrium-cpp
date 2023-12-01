@@ -55,6 +55,8 @@ class Network {
     void add_vertex(const size_t vertexID, const VertexProps& vertex_props);
     void add_edge(const size_t edgeID, const size_t oVertexID,
                   const size_t dVertexID, const EdgeProps& edge_props);
+    int num_vertices();
+    int num_edges();
     const double calc_length(int oVertexID, int dVertexID);
     bgi::rtree<std::pair<point_t, size_t>, bgi::quadratic<16>> generate_rtree()
         const;

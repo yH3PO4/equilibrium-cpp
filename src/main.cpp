@@ -16,6 +16,9 @@ int main() {
 
     Network network = io::read_network(in_vertex_path, in_edge_path);
     std::vector<OD> ods = io::read_od(od_path);
+    std::cout << "Number of vertices: " << network.num_vertices() << std::endl;
+    std::cout << "Number of edges: " << network.num_edges() << std::endl;
+    std::cout << "Number of OD pairs: " << ods.size() << std::endl;
     assignment::set_nearest_vertex(network, ods);
     assignment::assignment(network, ods);
 }

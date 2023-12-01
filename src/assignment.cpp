@@ -12,7 +12,6 @@ void assignment::assignment(Network &network, const std::vector<OD> &ods) {
     }
     double delta = DBL_MAX;
     int n = 0;
-    std::cout << delta << std::endl;
     while (delta > THRES_DELTA) {
         n++;
         network.update_all_flow();
@@ -38,7 +37,8 @@ void assignment::assignment(Network &network, const std::vector<OD> &ods) {
         double minxi = xi2;                   // 最小になるときのxi
         double minz = network.calc_z(minxi);  // 最小になるときの目的関数
         delta = network.update_optimal_flow(minxi);
-        std::cout << delta << " " << minz << std::endl;
+        std::cout << "z= " << minz << " delta=" << delta << " xi=" << minxi
+                  << std::endl;
     }
 }
 

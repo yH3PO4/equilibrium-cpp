@@ -50,6 +50,10 @@ void Network::add_edge(const size_t edgeID, const size_t oVertexID,
     }
 }
 
+int Network::num_vertices() { return boost::num_vertices(this->graph); }
+
+int Network::num_edges() { return boost::num_edges(this->graph); }
+
 const double Network::calc_length(int oVertexID, int dVertexID) {
     graph_t::vertex_descriptor oVertex, dVertex;
     try {
