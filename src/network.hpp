@@ -65,6 +65,7 @@ class Network {
     void update_all_flow();
     double calc_z(double xi);
     double update_optimal_flow(double minxi);
+    void set_result();
 
    private:
     graph_t graph;

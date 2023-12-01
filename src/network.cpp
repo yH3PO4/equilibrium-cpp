@@ -189,3 +189,13 @@ std::vector<Network::graph_t::edge_descriptor> Network::shortest_path(
     std::cout << "経路が存在しません" << std::endl;
     return {};
 }
+
+void Network::set_result(){
+    auto edges = boost::edges(graph);
+    for (auto eit = edges.first; eit != edges.second; ++eit) {
+        // iterate all edges
+        Network::EdgeProps &edge = graph[*eit];
+        edge.flow = edge.newflow;
+        edge.cost = edge.bpr();
+    }
+}

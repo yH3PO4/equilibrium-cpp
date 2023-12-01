@@ -40,6 +40,7 @@ void assignment::assignment(Network &network, const std::vector<OD> &ods) {
         std::cout << "z= " << minz << " delta=" << delta << " xi=" << minxi
                   << std::endl;
     }
+    network.set_result();
 }
 
 void assignment::set_nearest_vertex(const Network &network,
