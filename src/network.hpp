@@ -9,17 +9,20 @@
 class Network {
    public:
     struct VertexProps {
+        int outerID;
         point_t lonlat;
         VertexProps();  // これないとコンパイル通らない
-        VertexProps(double _lat, double _lon);
+        VertexProps(size_t vertexID, double _lat, double _lon);
     };
-
     struct EdgeProps {
+        int outerID;
         int laneCount, maxSpeed;
-        double flow, newflow, cost, freecost, capacity;
+        double length, capacity;
+        double flow, newflow, cost, freecost;
         EdgeProps();  // これないとコンパイル通らない
-        EdgeProps(int _laneCount, int _maxSpeed);
+        EdgeProps(size_t edgeID, int _laneCount, int _maxSpeed, double _length);
         double bpr();
+        double bpr(double _flow);
     };
     typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS,
                                   VertexProps, EdgeProps>
@@ -48,14 +51,25 @@ class Network {
 
     static const double alpha;
     static const double beta;
+    static const double gamma;
+    static const double c;
 
-    void add_vertex(const size_t vertexID, const VertexProps& vertex_props);
-    void add_edge(const size_t edgeID, const size_t oVertexID,
-                  const size_t dVertexID, const EdgeProps& edge_props);
+    void add_vertex(const VertexProps& vertex_props);
+    void add_edge(const size_t oVertexID, const size_t dVertexID,
+                  const EdgeProps& edge_props);
+    int num_vertices();
+    int num_edges();
+    const double calc_length(int oVertexID, int dVertexID);
     bgi::rtree<std::pair<point_t, size_t>, bgi::quadratic<16>> generate_rtree()
         const;
-    void update_flow(const size_t oVertexID, const size_t dVertexID,
-                     const double flow);
+    void all_or_nothing(const size_t oVertexID, const size_t dVertexID,
+                        const double flow);
+    void update_all_flow();
+    double calc_z(double xi);
+    double update_optimal_flow(double minxi);
+    void set_result();
+    const std::vector<std::tuple<int, int, double, double, int, double, double, double>>
+    get_link_flow() const;
 
    private:
     graph_t graph;

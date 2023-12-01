@@ -29,7 +29,7 @@ void io::read_vertex(const std::string &in_vertex_path, Network &network) {
         size_t vertexID = std::stoi(row_vec.at(0));
         double lat = std::stod(row_vec.at(1));
         double lon = std::stod(row_vec.at(2));
-        network.add_vertex(vertexID, {lat, lon});
+        network.add_vertex({vertexID, lat, lon});
     }
 }
 void io::read_edge(const std::string &in_edge_path, Network &network) {
@@ -48,7 +48,9 @@ void io::read_edge(const std::string &in_edge_path, Network &network) {
         size_t dVertexID = std::stoi(row_vec.at(2));
         int laneCount = std::stoi(row_vec.at(3));
         int maxSpeed = std::stoi(row_vec.at(4));
-        network.add_edge(edgeID, oVertexID, dVertexID, {laneCount, maxSpeed});
+        double length = network.calc_length(oVertexID, dVertexID);
+        network.add_edge(oVertexID, dVertexID,
+                         {edgeID, laneCount, maxSpeed, length});
     }
 }
 
@@ -81,4 +83,15 @@ std::vector<OD> io::read_od(const std::string &od_path) {
         res.emplace_back(od);
     }
     return res;
+}
+
+void io::output_flow(const std::string &output_path, const Network &network) {
+    std::ofstream ofs(output_path);
+    ofs << "edge_ID,oNodeID,oLat,oLon,dNodeID,dLat,dLon,flow" << std::endl;
+    for (const auto &[edge_ID, oNodeID, oLat, oLon, dNodeID, dLat, dLon, flow] :
+         network.get_link_flow()) {
+        ofs << std::setprecision(10) << edge_ID << "," << oNodeID << "," << oLat
+            << "," << oLon << "," << dNodeID << "," << dLat << "," << dLon
+            << "," << flow << std::endl;
+    }
 }
