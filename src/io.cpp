@@ -94,3 +94,24 @@ void io::output_flow(const std::string &output_path, const Network &network) {
             << target.lonlat.get<1>() << "," << edge.flow << std::endl;
     }
 }
+
+std::unordered_map<size_t, std::tuple<size_t, size_t, double>> io::read_flow(
+    const std::string &flow_path) {
+    std::ifstream ifs(flow_path);
+    if (!ifs) {
+        throw "Exception : flow network file not found";
+    }
+    std::unordered_map<size_t, std::tuple<size_t, size_t, double>> res;
+    std::string row_str;
+    getline(ifs, row_str);  // 1行とばす
+    while (getline(ifs, row_str)) {
+        const auto row_vec = split(row_str);
+        assert(row_vec.size() == 8);
+        const size_t edgeID = std::stoi(row_vec.at(0));
+        const size_t oNodeID = std::stod(row_vec.at(1));
+        const size_t dNodeID = std::stod(row_vec.at(4));
+        const double flow = std::stod(row_vec.at(7));
+        res.emplace(edgeID, std::make_tuple(oNodeID, dNodeID, flow));
+    }
+    return res;
+}

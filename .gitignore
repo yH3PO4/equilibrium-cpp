@@ -1,4 +1,6 @@
 /.vscode
-/Input_data
-/Output_data
+/Input_data/*
+!/Input_data/test
+/Output_data/*
+!/Output_data/test
 /build

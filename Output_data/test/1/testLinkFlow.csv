@@ -1,0 +1,2 @@
+edge_ID,oNodeID,oLat,oLon,dNodeID,dLat,dLon,flow
+1,1,35.689629,139.699485,2,35.681455,139.766388,10000
