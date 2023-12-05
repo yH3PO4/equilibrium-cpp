@@ -29,7 +29,7 @@ void io::read_vertex(const std::string &in_vertex_path, Network &network) {
         const size_t vertexID = std::stoi(row_vec.at(0));
         const double lat = std::stod(row_vec.at(1));
         const double lon = std::stod(row_vec.at(2));
-        network.add_vertex({vertexID, lat, lon});
+        network.add_vertex({vertexID, lon, lat});
     }
 }
 void io::read_edge(const std::string &in_edge_path, Network &network) {
@@ -79,7 +79,7 @@ std::vector<OD> io::read_od(const std::string &od_path) {
         const double dlat = std::stod(row_vec.at(2));
         const double dlon = std::stod(row_vec.at(3));
         const double flow = std::stod(row_vec.at(4));
-        res.emplace_back(olat, olon, dlat, dlon, flow);
+        res.emplace_back(olon, olat, dlon, dlat, flow);
     }
     return res;
 }
@@ -89,9 +89,9 @@ void io::output_flow(const std::string &output_path, const Network &network) {
     ofs << "edge_ID,oNodeID,oLat,oLon,dNodeID,dLat,dLon,flow" << std::endl;
     for (const auto &[source, target, edge] : network.get_link_flow()) {
         ofs << std::setprecision(10) << edge.outerID << "," << source.outerID
-            << "," << source.lonlat.get<0>() << "," << source.lonlat.get<1>()
-            << "," << target.outerID << "," << target.lonlat.get<0>() << ","
-            << target.lonlat.get<1>() << "," << edge.flow << std::endl;
+            << "," << source.lonlat.get<1>() << "," << source.lonlat.get<0>()
+            << "," << target.outerID << "," << target.lonlat.get<1>() << ","
+            << target.lonlat.get<0>() << "," << edge.flow << std::endl;
     }
 }
 
