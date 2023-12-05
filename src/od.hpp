@@ -9,5 +9,5 @@ struct OD {
     double flow;
     size_t oVertexID;
     size_t dVertexID;
-    OD(double _olat, double _olon, double _dlat, double _dlon, double _flow);
+    OD(double _olon, double _olat, double _dlon, double _dlat, double _flow);
 };

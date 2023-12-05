@@ -12,7 +12,7 @@ class Network {
         int outerID;
         point_t lonlat;
         VertexProps();  // これないとコンパイル通らない
-        VertexProps(size_t vertexID, double _lat, double _lon);
+        VertexProps(size_t vertexID, double _lon, double _lat);
     };
     struct EdgeProps {
         int outerID;

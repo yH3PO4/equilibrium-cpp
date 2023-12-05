@@ -5,9 +5,9 @@
 
 Network::VertexProps::VertexProps() {}
 
-Network::VertexProps::VertexProps(size_t vertexID, double _lat, double _lon) {
+Network::VertexProps::VertexProps(size_t vertexID, double _lon, double _lat) {
     this->outerID = vertexID;
-    this->lonlat = point_t(_lat, _lon);
+    this->lonlat = point_t(_lon, _lat);
 }
 
 Network::EdgeProps::EdgeProps() {}
