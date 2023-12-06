@@ -9,13 +9,13 @@
 class Network {
    public:
     struct VertexProps {
-        int outerID;
+        size_t outerID;
         point_t lonlat;
         VertexProps();  // これないとコンパイル通らない
         VertexProps(size_t vertexID, double _lon, double _lat);
     };
     struct EdgeProps {
-        int outerID;
+        size_t outerID;
         int laneCount, maxSpeed;
         double length, capacity;
         double flow, newflow, cost, freecost;
@@ -75,7 +75,6 @@ class Network {
    private:
     graph_t graph;
     std::unordered_map<size_t, graph_t::vertex_descriptor> v_desc;
-    std::unordered_map<size_t, graph_t::edge_descriptor> e_desc;
     std::vector<graph_t::edge_descriptor> shortest_path(size_t oVertexID,
                                                         size_t dVertexID) const;
 };

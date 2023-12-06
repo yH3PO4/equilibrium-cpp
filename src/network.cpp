@@ -45,9 +45,7 @@ void Network::add_edge(const size_t oVertexID, const size_t dVertexID,
     const auto [e, flag] =
         boost::add_edge(this->v_desc.at(oVertexID), this->v_desc.at(dVertexID),
                         edge_props, this->graph);
-    if (flag) {
-        this->e_desc[edge_props.outerID] = e;
-    } else {
+    if (!flag) {
         std::cout << "Failed to add edge with edge_id " << edge_props.outerID
                   << std::endl;
     }

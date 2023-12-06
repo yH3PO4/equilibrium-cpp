@@ -21,8 +21,8 @@ bool test(const std::string &in_vertex_path, const std::string &in_edge_path,
         io::read_flow(output_path);
     for (const auto &[source_props, target_props, edge_props] :
          network.get_link_flow()) {
-        int source = source_props.outerID;
-        int target = target_props.outerID;
+        size_t source = source_props.outerID;
+        size_t target = target_props.outerID;
         double flow = edge_props.flow;
         const auto &[exact_source, exact_target, exact_flow] =
             exact_solution.at(edge_props.outerID);
