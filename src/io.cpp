@@ -57,8 +57,12 @@ void io::read_edge(const std::string &in_edge_path, Network &network) {
 Network io::read_network(const std::string &in_vertex_path,
                          const std::string &in_edge_path) {
     Network network;
-    read_vertex(in_vertex_path, network);
-    read_edge(in_edge_path, network);
+    try {
+        read_vertex(in_vertex_path, network);
+        read_edge(in_edge_path, network);
+    } catch (const char *e) {
+        throw e;
+    }
     return network;
 }
 
