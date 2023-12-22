@@ -15,8 +15,16 @@ int main() {
     const std::string od_path = "Input_data/Tokyo/TokyoOD.csv";
     const std::string output_path = "Output_data/Tokyo/TokyoLinkFlow.csv";
 
-    Network network = io::read_network(in_vertex_path, in_edge_path);
-    std::vector<OD> ods = io::read_od(od_path);
+    Network network;
+    std::vector<OD> ods;
+    try {
+        network = io::read_network(in_vertex_path, in_edge_path);
+        ods = io::read_od(od_path);
+    } catch (const char *e) {
+        std::cout << e << std::endl;
+        return -1;
+    }
+
     std::cout << "Number of vertices: " << network.num_vertices() << std::endl;
     std::cout << "Number of edges: " << network.num_edges() << std::endl;
     std::cout << "Number of OD pairs: " << ods.size() << std::endl;
