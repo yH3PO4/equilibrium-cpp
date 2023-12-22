@@ -48,7 +48,7 @@ void Network::add_edge(const unsigned int oVertexID,
         boost::add_edge(this->v_desc.at(oVertexID), this->v_desc.at(dVertexID),
                         edge_props, this->graph);
     if (!flag) {
-        std::cout << "Failed to add edge with edge_id " << edge_props.outerID
+        std::cerr << "Failed to add edge with edge_id " << edge_props.outerID
                   << std::endl;
     }
 }
@@ -62,13 +62,13 @@ double Network::calc_length(int oVertexID, int dVertexID) const {
     try {
         oVertex = this->v_desc.at(oVertexID);
     } catch (std::out_of_range &ex) {
-        std::cout << oVertexID << " is not in graph" << std::endl;
+        std::cerr << oVertexID << " is not in graph" << std::endl;
         return 0;
     }
     try {
         dVertex = this->v_desc.at(dVertexID);
     } catch (std::out_of_range &ex) {
-        std::cout << dVertexID << " is not in graph" << std::endl;
+        std::cerr << dVertexID << " is not in graph" << std::endl;
         return 0;
     }
 
@@ -168,7 +168,7 @@ std::vector<Network::graph_t::edge_descriptor> Network::shortest_path(
                                 .visitor(astar_goal_visitor(goal)));
     } catch (found_goal fg) {
         if (parents.at(goal) == goal) {
-            std::cout << "経路が存在しません" << std::endl;
+            std::cerr << "経路が存在しません" << std::endl;
             return {};
         }
         std::vector<graph_t::edge_descriptor> route;
@@ -177,7 +177,7 @@ std::vector<Network::graph_t::edge_descriptor> Network::shortest_path(
             graph_t::vertex_descriptor p = parents.at(v);
             const auto [e, flag] = boost::edge(p, v, graph);
             if (!flag) {
-                std::cout << "経路復元に失敗しました" << std::endl;
+                std::cerr << "経路復元に失敗しました" << std::endl;
                 return {};
             }
             route.push_back(e);
@@ -186,7 +186,7 @@ std::vector<Network::graph_t::edge_descriptor> Network::shortest_path(
         std::reverse(route.begin(), route.end());  // 起点->終点ｎ
         return route;
     }
-    std::cout << "経路が存在しません" << std::endl;
+    std::cerr << "経路が存在しません" << std::endl;
     return {};
 }
 

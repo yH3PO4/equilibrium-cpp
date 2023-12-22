@@ -29,7 +29,7 @@ bool test(const std::string &in_vertex_path, const std::string &in_edge_path,
             exact_solution.at(edge_props.outerID);
         if (source != exact_source || target != exact_target ||
             std::abs(flow - exact_flow) / exact_flow > 1e-3) {
-            std::cout << "failed at edge: " << edge_props.outerID
+            std::cerr << "failed at edge: " << edge_props.outerID
                       << ", source: " << source << ", target: " << target
                       << ", flow: " << flow << ", exact_flow:" << exact_flow
                       << std::endl;

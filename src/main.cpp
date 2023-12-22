@@ -21,7 +21,7 @@ int main() {
         network = io::read_network(in_vertex_path, in_edge_path);
         ods = io::read_od(od_path);
     } catch (const char *e) {
-        std::cout << e << std::endl;
+        std::cerr << e << std::endl;
         return -1;
     }
 
