@@ -22,7 +22,7 @@ int main() {
         ods = io::read_od(od_path);
     } catch (const char *e) {
         std::cerr << e << std::endl;
-        return -1;
+        return 0;
     }
 
     std::cout << "Number of vertices: " << network.num_vertices() << std::endl;
