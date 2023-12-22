@@ -47,7 +47,7 @@ void assignment::set_nearest_vertex(const Network &network,
                                     std::vector<OD> &ods) {
     const auto rtree = network.generate_rtree();
     for (auto &od : ods) {
-        std::vector<std::pair<point_t, size_t>> res{};
+        std::vector<std::pair<point_t, unsigned int>> res{};
         rtree.query(bgi::nearest(od.oPoint, 1), std::back_inserter(res));
         od.oVertexID = res[0].second;
         res.clear();

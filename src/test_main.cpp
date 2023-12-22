@@ -17,12 +17,13 @@ bool test(const std::string &in_vertex_path, const std::string &in_edge_path,
     assignment::assignment(network, ods);
     // io::output_flow(output_path, network);
 
-    std::unordered_map<size_t, std::tuple<size_t, size_t, double>> exact_solution =
-        io::read_flow(output_path);
+    std::unordered_map<unsigned int,
+                       std::tuple<unsigned int, unsigned int, double>>
+        exact_solution = io::read_flow(output_path);
     for (const auto &[source_props, target_props, edge_props] :
          network.get_link_flow()) {
-        size_t source = source_props.outerID;
-        size_t target = target_props.outerID;
+        unsigned int source = source_props.outerID;
+        unsigned int target = target_props.outerID;
         double flow = edge_props.flow;
         const auto &[exact_source, exact_target, exact_flow] =
             exact_solution.at(edge_props.outerID);

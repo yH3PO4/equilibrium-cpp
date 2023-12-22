@@ -26,7 +26,7 @@ void io::read_vertex(const std::string &in_vertex_path, Network &network) {
     while (getline(ifs, row_str)) {
         const auto row_vec = split(row_str);
         assert(row_vec.size() == 3);
-        const size_t vertexID = std::stoi(row_vec.at(0));
+        const unsigned int vertexID = std::stoi(row_vec.at(0));
         const double lat = std::stod(row_vec.at(1));
         const double lon = std::stod(row_vec.at(2));
         network.add_vertex({vertexID, lon, lat});
@@ -43,9 +43,9 @@ void io::read_edge(const std::string &in_edge_path, Network &network) {
     while (getline(ifs, row_str)) {
         const auto row_vec = split(row_str);
         assert(row_vec.size() == 5);
-        const size_t edgeID = std::stoi(row_vec.at(0));
-        const size_t oVertexID = std::stoi(row_vec.at(1));
-        const size_t dVertexID = std::stoi(row_vec.at(2));
+        const unsigned int edgeID = std::stoi(row_vec.at(0));
+        const unsigned int oVertexID = std::stoi(row_vec.at(1));
+        const unsigned int dVertexID = std::stoi(row_vec.at(2));
         const int laneCount = std::stoi(row_vec.at(3));
         const int maxSpeed = std::stoi(row_vec.at(4));
         const double length = network.calc_length(oVertexID, dVertexID);
@@ -95,21 +95,23 @@ void io::output_flow(const std::string &output_path, const Network &network) {
     }
 }
 
-std::unordered_map<size_t, std::tuple<size_t, size_t, double>> io::read_flow(
-    const std::string &flow_path) {
+std::unordered_map<unsigned int, std::tuple<unsigned int, unsigned int, double>>
+io::read_flow(const std::string &flow_path) {
     std::ifstream ifs(flow_path);
     if (!ifs) {
         throw "Exception : flow network file not found";
     }
-    std::unordered_map<size_t, std::tuple<size_t, size_t, double>> res;
+    std::unordered_map<unsigned int,
+                       std::tuple<unsigned int, unsigned int, double>>
+        res;
     std::string row_str;
     getline(ifs, row_str);  // 1行とばす
     while (getline(ifs, row_str)) {
         const auto row_vec = split(row_str);
         assert(row_vec.size() == 8);
-        const size_t edgeID = std::stoi(row_vec.at(0));
-        const size_t oNodeID = std::stod(row_vec.at(1));
-        const size_t dNodeID = std::stod(row_vec.at(4));
+        const unsigned int edgeID = std::stoi(row_vec.at(0));
+        const unsigned int oNodeID = std::stoi(row_vec.at(1));
+        const unsigned int dNodeID = std::stoi(row_vec.at(4));
         const double flow = std::stod(row_vec.at(7));
         res.emplace(edgeID, std::make_tuple(oNodeID, dNodeID, flow));
     }

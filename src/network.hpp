@@ -9,18 +9,19 @@
 class Network {
    public:
     struct VertexProps {
-        size_t outerID;
+        unsigned int outerID;
         point_t lonlat;
         VertexProps();  // これないとコンパイル通らない
-        VertexProps(size_t vertexID, double _lon, double _lat);
+        VertexProps(unsigned int vertexID, double _lon, double _lat);
     };
     struct EdgeProps {
-        size_t outerID;
+        unsigned int outerID;
         int laneCount, maxSpeed;
         double length, capacity;
         double flow, newflow, cost, freecost;
         EdgeProps();  // これないとコンパイル通らない
-        EdgeProps(size_t edgeID, int _laneCount, int _maxSpeed, double _length);
+        EdgeProps(unsigned int edgeID, int _laneCount, int _maxSpeed,
+                  double _length);
         double bpr() const;
         double bpr(double _flow) const;
     };
@@ -56,25 +57,25 @@ class Network {
     static const double c;
 
     void add_vertex(const VertexProps& vertex_props);
-    void add_edge(const size_t oVertexID, const size_t dVertexID,
+    void add_edge(const unsigned int oVertexID, const unsigned int dVertexID,
                   const EdgeProps& edge_props);
     int num_vertices() const;
     int num_edges() const;
     double calc_length(int oVertexID, int dVertexID) const;
-    bgi::rtree<std::pair<point_t, size_t>, bgi::quadratic<16>> generate_rtree()
-        const;
-    void all_or_nothing(const size_t oVertexID, const size_t dVertexID,
-                        const double flow);
+    bgi::rtree<std::pair<point_t, unsigned int>, bgi::quadratic<16>>
+    generate_rtree() const;
+    void all_or_nothing(const unsigned int oVertexID,
+                        const unsigned int dVertexID, const double flow);
     void update_all_flow();
     double calc_z(double xi) const;
     double update_optimal_flow(double minxi);
     void set_result();
-    std::vector<std::tuple<VertexProps, VertexProps, EdgeProps>>
-    get_link_flow() const;
+    std::vector<std::tuple<VertexProps, VertexProps, EdgeProps>> get_link_flow()
+        const;
 
    private:
     graph_t graph;
-    std::unordered_map<size_t, graph_t::vertex_descriptor> v_desc;
-    std::vector<graph_t::edge_descriptor> shortest_path(size_t oVertexID,
-                                                        size_t dVertexID) const;
+    std::unordered_map<unsigned int, graph_t::vertex_descriptor> v_desc;
+    std::vector<graph_t::edge_descriptor> shortest_path(
+        unsigned int oVertexID, unsigned int dVertexID) const;
 };

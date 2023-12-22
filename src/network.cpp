@@ -5,15 +5,16 @@
 
 Network::VertexProps::VertexProps() {}
 
-Network::VertexProps::VertexProps(size_t vertexID, double _lon, double _lat) {
+Network::VertexProps::VertexProps(unsigned int vertexID, double _lon,
+                                  double _lat) {
     this->outerID = vertexID;
     this->lonlat = point_t(_lon, _lat);
 }
 
 Network::EdgeProps::EdgeProps() {}
 
-Network::EdgeProps::EdgeProps(size_t edgeID, int _laneCount, int _maxSpeed,
-                              double _length) {
+Network::EdgeProps::EdgeProps(unsigned int edgeID, int _laneCount,
+                              int _maxSpeed, double _length) {
     this->outerID = edgeID;
     this->laneCount = _laneCount;
     this->maxSpeed = _maxSpeed;
@@ -40,7 +41,8 @@ void Network::add_vertex(const VertexProps &vertex_props) {
     this->v_desc[vertex_props.outerID] = v;
 }
 
-void Network::add_edge(const size_t oVertexID, const size_t dVertexID,
+void Network::add_edge(const unsigned int oVertexID,
+                       const unsigned int dVertexID,
                        const EdgeProps &edge_props) {
     const auto [e, flag] =
         boost::add_edge(this->v_desc.at(oVertexID), this->v_desc.at(dVertexID),
@@ -75,17 +77,17 @@ double Network::calc_length(int oVertexID, int dVertexID) const {
     return length;
 }
 
-bgi::rtree<std::pair<point_t, size_t>, bgi::quadratic<16>>
+bgi::rtree<std::pair<point_t, unsigned int>, bgi::quadratic<16>>
 Network::generate_rtree() const {
-    bgi::rtree<std::pair<point_t, size_t>, bgi::quadratic<16>> rtree;
+    bgi::rtree<std::pair<point_t, unsigned int>, bgi::quadratic<16>> rtree;
     for (const auto &v : this->v_desc) {
         rtree.insert(std::make_pair(this->graph[v.second].lonlat, v.first));
     }
     return rtree;
 }
 
-void Network::all_or_nothing(const size_t oVertexID, const size_t dVertexID,
-                             const double flow) {
+void Network::all_or_nothing(const unsigned int oVertexID,
+                             const unsigned int dVertexID, const double flow) {
     std::vector<graph_t::edge_descriptor> path =
         shortest_path(oVertexID, dVertexID);
     for (const auto &e : path) graph[e].newflow += flow;
@@ -152,7 +154,7 @@ void Network::astar_goal_visitor::examine_vertex(graph_t::vertex_descriptor u,
 }
 
 std::vector<Network::graph_t::edge_descriptor> Network::shortest_path(
-    size_t oVertexID, size_t dVertexID) const {
+    unsigned int oVertexID, unsigned int dVertexID) const {
     std::vector<graph_t::vertex_descriptor> parents(
         boost::num_vertices(graph));  // これにO(N)かかるか要調査
 

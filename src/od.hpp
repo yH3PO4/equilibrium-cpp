@@ -7,7 +7,7 @@ struct OD {
     point_t oPoint;
     point_t dPoint;
     double flow;
-    size_t oVertexID;
-    size_t dVertexID;
+    unsigned int oVertexID;
+    unsigned int dVertexID;
     OD(double _olon, double _olat, double _dlon, double _dlat, double _flow);
 };
